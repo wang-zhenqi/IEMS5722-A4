@@ -7,18 +7,23 @@ app.debug=True
 
 socketio = SocketIO(app)
 
-@app.route("/api/a4/broadcast_room", methods=["GET"])
+@app.route("/api/a4/broadcast_room", methods=["POST"])
 def broadcast_room():
     result = {}
-    chatroom_id = int(request.args.get('chatroom_id'))
-    message = request.args.get('message')
-    if not (chatroom_id and message):
+    chatroom_id = int(request.form.get('chatroom_id', '-1'))
+    name = request.form.get('name', '')
+    message = request.form.get('message', '')
+    timestamp = request.form.get('timestamp', '')
+    if chatroom_id == -1 or name == '' or message == '' or timestamp == '':
         result['message'] = 'Invailid Parameter'
         result['status'] = 'Error'
-        return jsonify(result)
-    result['chatroom_id'] = chatroom_id
-    result['message'] = message
-    socketio.emit('new_message', {'text': 'message'}, room=chatroom_id)
+    else:
+        result['message'] = message
+        result['name'] = name
+        result['timestamp'] = timestamp[:-3]
+        result['status'] = 'OK'
+    print(result, flush=True)
+    socketio.emit('new_message', result, room=chatroom_id)
     return jsonify(result)
 
 @socketio.on('my event')
@@ -28,13 +33,13 @@ def my_event_handler(data):
 @socketio.on('join')
 def on_join(data):
     chatroom_id = data['chatroom_id']
-    print(chatroom_id)
+    print(chatroom_id, flush=True)
     join_room(chatroom_id)
 
 @socketio.on('leave')
 def on_leave(data):
     chatroom_id = data['chatroom_id']
-    print(chatroom_id)
+    print(chatroom_id, flush=True)
     leave_room(chatroom_id)
 
 if __name__ == '__main__':
