@@ -22,7 +22,7 @@ def broadcast_room():
         result['name'] = name
         result['timestamp'] = timestamp[:-3]
         result['status'] = 'OK'
-    print(result, flush=True)
+    print("emit message:" + str(result) + "to chatroom " + str(chatroom_id), flush=True)
     socketio.emit('new_message', result, room=chatroom_id)
     return jsonify(result)
 
@@ -33,13 +33,13 @@ def my_event_handler(data):
 @socketio.on('join')
 def on_join(data):
     chatroom_id = data['chatroom_id']
-    print(chatroom_id, flush=True)
+    print("join the room " + str(chatroom_id), flush=True)
     join_room(chatroom_id)
 
 @socketio.on('leave')
 def on_leave(data):
     chatroom_id = data['chatroom_id']
-    print(chatroom_id, flush=True)
+    print("leave the room " + str(chatroom_id), flush=True)
     leave_room(chatroom_id)
 
 if __name__ == '__main__':
