@@ -26,9 +26,14 @@ def broadcast_room():
     socketio.emit('new_message', result, room=chatroom_id)
     return jsonify(result)
 
-@socketio.on('my event')
-def my_event_handler(data):
-    emit(...)
+@socketio.on('connect')
+def connect_handler():
+    print("connected", flush=True)
+    emit("select_room")
+
+@socketio.on('disconnect')
+def disconnect_handler():
+    print("disconnect", flush=True)
 
 @socketio.on('join')
 def on_join(data):
